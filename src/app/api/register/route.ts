@@ -4,27 +4,27 @@ import { TransactionType } from "@prisma/client";
 
 export async function POST(req: Request) {
   try {
-    const { name, email, password } = await req.json();
+    const body = await req.json();
+    const { name, email, password } = body;
 
     if (!email || !password) {
       return NextResponse.json({ message: "Missing fields" }, { status: 400 });
     }
 
     const existingUser = await prisma.user.findUnique({
-      where: { email },
+      where: { email: String(email) },
     });
 
     if (existingUser) {
       return NextResponse.json({ message: "User already exists" }, { status: 400 });
     }
 
-    // Create user and their default space in a transaction
     const user = await prisma.$transaction(async (tx) => {
       const newUser = await tx.user.create({
         data: {
-          name,
-          email,
-          password, // In production, hash this!
+          name: String(name),
+          email: String(email),
+          password: String(password),
         },
       });
 
@@ -36,7 +36,6 @@ export async function POST(req: Request) {
         },
       });
 
-      // Create default wallet
       await tx.wallet.create({
         data: {
           name: "Efectivo",
@@ -55,7 +54,6 @@ export async function POST(req: Request) {
         },
       });
 
-      // Add default categories
       const defaultCategories = [
         { name: "Comida", type: TransactionType.EXPENSE, icon: "Utensils", color: "#ef4444" },
         { name: "Transporte", type: TransactionType.EXPENSE, icon: "Car", color: "#3b82f6" },
@@ -66,9 +64,12 @@ export async function POST(req: Request) {
       for (const cat of defaultCategories) {
         await tx.category.create({
           data: {
-            ...cat,
+            name: cat.name,
+            type: cat.type,
+            icon: cat.icon,
+            color: cat.color,
             spaceId: personalSpace.id,
-          } as any, // Using any here to bypass complex type check for demo
+          },
         });
       }
 
@@ -76,8 +77,8 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ user }, { status: 201 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+  } catch (error: any) {
+    console.error("Registration error:", error);
+    return NextResponse.json({ message: error.message || "Server error" }, { status: 500 });
   }
 }

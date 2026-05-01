@@ -5,15 +5,26 @@ import { Shell } from "@/components/layout/Shell";
 import { useSpace } from "@/context/SpaceContext";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Download, FileSpreadsheet, File as FilePdf, List } from "lucide-react";
+import { Download, FileSpreadsheet, File as FilePdf } from "lucide-react";
 import styles from "./Reports.module.css";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import "jspdf-autotable";
 
+interface Transaction {
+  id: string;
+  date: string;
+  type: string;
+  amount: number;
+  description: string;
+  tags: string;
+  category: { name: string; color: string };
+  wallet?: { name: string };
+}
+
 export default function ReportsPage() {
   const { activeSpace } = useSpace();
-  const [transactions, setTransactions] = useState([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   useEffect(() => {
     if (activeSpace) {
@@ -22,8 +33,13 @@ export default function ReportsPage() {
   }, [activeSpace]);
 
   const fetchTransactions = async () => {
-    const res = await fetch(`/api/transactions/all?spaceId=${activeSpace?.id}`);
-    setTransactions(await res.json());
+    try {
+      const res = await fetch(`/api/transactions/all?spaceId=${activeSpace?.id}`);
+      const data = await res.json();
+      setTransactions(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   const exportToExcel = () => {
@@ -32,9 +48,9 @@ export default function ReportsPage() {
       Tipo: t.type,
       Monto: t.amount,
       Categoría: t.category.name,
-      Cuenta: t.wallet?.name,
-      Descripción: t.description,
-      Etiquetas: t.tags
+      Cuenta: t.wallet?.name || "N/A",
+      Descripción: t.description || "",
+      Etiquetas: t.tags || ""
     })));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Movimientos");
@@ -51,7 +67,7 @@ export default function ReportsPage() {
         t.type,
         t.category.name,
         `$${t.amount}`,
-        t.wallet?.name
+        t.wallet?.name || "N/A"
       ]),
       startY: 20,
     });
@@ -102,7 +118,7 @@ export default function ReportsPage() {
                 </tr>
               </thead>
               <tbody>
-                {transactions.slice(0, 10).map((t: any) => (
+                {transactions.slice(0, 10).map((t) => (
                   <tr key={t.id}>
                     <td>{new Date(t.date).toLocaleDateString()}</td>
                     <td>{t.category.name}</td>

@@ -7,17 +7,33 @@ import { SummaryChart } from "@/components/dashboard/SummaryChart";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
 import { TransactionForm } from "@/components/dashboard/TransactionForm";
-import { Plus, TrendingUp, TrendingDown, MoreHorizontal, FileText, Download } from "lucide-react";
+import { Plus, TrendingUp, TrendingDown, FileText, Download } from "lucide-react";
 import styles from "./Dashboard.module.css";
 import { clsx } from "clsx";
+
+interface ChartDataItem {
+  name: string;
+  value: number;
+  color: string;
+}
+
+interface TransactionItem {
+  id: string;
+  amount: number;
+  type: string;
+  description: string;
+  date: string;
+  category: { name: string; color: string };
+  wallet?: { name: string };
+}
 
 export default function DashboardPage() {
   const { activeSpace } = useSpace();
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [formType, setFormType] = useState<"EXPENSE" | "INCOME">("EXPENSE");
   const [stats, setStats] = useState({ income: 0, expenses: 0, balance: 0 });
-  const [chartData, setChartData] = useState([]);
-  const [recentTransactions, setRecentTransactions] = useState([]);
+  const [chartData, setChartData] = useState<ChartDataItem[]>([]);
+  const [recentTransactions, setRecentTransactions] = useState<TransactionItem[]>([]);
 
   useEffect(() => {
     if (activeSpace) {
@@ -29,9 +45,9 @@ export default function DashboardPage() {
     try {
       const res = await fetch(`/api/dashboard?spaceId=${activeSpace?.id}`);
       const data = await res.json();
-      setStats(data.stats);
-      setChartData(data.chartData);
-      setRecentTransactions(data.recentTransactions);
+      setStats(data.stats || { income: 0, expenses: 0, balance: 0 });
+      setChartData(data.chartData || []);
+      setRecentTransactions(data.recentTransactions || []);
     } catch (error) {
       console.error(error);
     }
@@ -107,7 +123,7 @@ export default function DashboardPage() {
             <button className={styles.viewAll}>Ver todo</button>
           </div>
           <div className={styles.transactionList}>
-            {recentTransactions.map((tx: any) => (
+            {recentTransactions.map((tx) => (
               <div key={tx.id} className={styles.transactionItem}>
                 <div className={styles.txIcon} style={{ backgroundColor: tx.category.color }}>
                   {tx.category.name[0]}

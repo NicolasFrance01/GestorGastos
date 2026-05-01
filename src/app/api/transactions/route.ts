@@ -7,35 +7,38 @@ import { TransactionType } from "@prisma/client";
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
 
-  if (!session) {
+  if (!session || !session.user) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
   try {
-    const { amount, type, categoryId, walletId, description, tags, spaceId } = await req.json();
+    const body = await req.json();
+    const { amount, type, categoryId, walletId, description, tags, spaceId } = body;
+
+    if (!amount || !type || !categoryId || !spaceId) {
+      return NextResponse.json({ message: "Missing fields" }, { status: 400 });
+    }
 
     const transaction = await prisma.$transaction(async (tx) => {
-      // Create transaction
       const newTx = await tx.transaction.create({
         data: {
-          amount,
+          amount: Number(amount),
           type: type as TransactionType,
-          categoryId,
-          walletId,
-          description,
-          tags,
-          spaceId,
+          categoryId: String(categoryId),
+          walletId: walletId ? String(walletId) : null,
+          description: description ? String(description) : null,
+          tags: tags ? String(tags) : null,
+          spaceId: String(spaceId),
         },
       });
 
-      // Update wallet balance
       if (walletId) {
         const multiplier = type === "INCOME" ? 1 : -1;
         await tx.wallet.update({
-          where: { id: walletId },
+          where: { id: String(walletId) },
           data: {
             balance: {
-              increment: amount * multiplier,
+              increment: Number(amount) * multiplier,
             },
           },
         });
@@ -45,8 +48,8 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json(transaction, { status: 201 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+  } catch (error: any) {
+    console.error("Transaction error:", error);
+    return NextResponse.json({ message: error.message || "Server error" }, { status: 500 });
   }
 }
