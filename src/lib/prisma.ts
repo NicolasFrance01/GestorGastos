@@ -4,7 +4,8 @@ import { Pool } from "@neondatabase/serverless";
 
 const connectionString = process.env.DATABASE_URL!;
 const pool = new Pool({ connectionString });
-const adapter = new PrismaNeon(pool);
+// Casting pool to any to resolve a known version mismatch in PrismaNeon types during Vercel builds
+const adapter = new PrismaNeon(pool as any);
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
