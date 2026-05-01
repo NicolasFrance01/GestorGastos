@@ -2,7 +2,11 @@ import { PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
 import { Pool } from "@neondatabase/serverless";
 
-const connectionString = process.env.DATABASE_URL!;
+if (!process.env.DATABASE_URL) {
+  throw new Error("DATABASE_URL is not set in environment variables");
+}
+
+const connectionString = process.env.DATABASE_URL;
 const pool = new Pool({ connectionString });
 // Casting pool to any to resolve a known version mismatch in PrismaNeon types during Vercel builds
 const adapter = new PrismaNeon(pool as any);
