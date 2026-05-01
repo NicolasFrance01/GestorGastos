@@ -1,0 +1,206 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease;
+}
+
+@media (min-width: 768px) {
+  .overlay {
+    align-items: center;
+  }
+}
+
+.modal {
+  background-color: var(--card);
+  width: 100%;
+  max-width: 500px;
+  border-radius: 2rem 2rem 0 0;
+  padding: 2rem;
+  box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@media (min-width: 768px) {
+  .modal {
+    border-radius: 1.5rem;
+  }
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.typeSwitcher {
+  background-color: #f1f5f9;
+  padding: 0.25rem;
+  border-radius: 1rem;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.typeBtn {
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  color: #64748b;
+}
+
+.activeExpense {
+  background-color: var(--expense);
+  color: white;
+}
+
+.activeIncome {
+  background-color: var(--income);
+  color: white;
+}
+
+.closeBtn {
+  color: #64748b;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.amountSection {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.currency {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.amountInput {
+  font-size: 3rem;
+  font-weight: 700;
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  text-align: center;
+}
+
+.grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.field label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+.field select {
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  outline: none;
+  background-color: white;
+}
+
+.categoryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+}
+
+.categoryBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.categoryBtn span {
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.catIcon {
+  width: 40px;
+  height: 40px;
+  background-color: var(--cat-color, #f1f5f9);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+
+.selectedCategory {
+  border-color: var(--primary);
+  background-color: var(--ring);
+}
+
+.inputGroup {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  background-color: white;
+}
+
+.inputGroup input, .inputGroup textarea {
+  width: 100%;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: inherit;
+}
+
+.inputGroup textarea {
+  min-height: 80px;
+  resize: none;
+}
+
+.photoBtn {
+  width: 100%;
+  border-style: dashed;
+}
+
+.submitBtn {
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+}

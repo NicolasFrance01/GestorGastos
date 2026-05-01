@@ -1,0 +1,125 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.header p {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.walletGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .walletGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .walletGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.walletCard {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  padding: 1.5rem;
+}
+
+.walletHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.iconWrapper {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.debit { background-color: #dbeafe; color: #3b82f6; }
+.credit { background-color: #fee2e2; color: #ef4444; }
+.cash { background-color: #dcfce7; color: #10b981; }
+
+.moreBtn {
+  color: #94a3b8;
+}
+
+.walletInfo h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 0.25rem;
+}
+
+.walletCategory {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.balance {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--foreground);
+  margin-top: 0.5rem;
+}
+
+.walletFooter {
+  border-top: 1px solid var(--border);
+  padding-top: 1rem;
+}
+
+.walletType {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.addCardPlaceholder {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: #94a3b8;
+  height: 200px;
+  background: transparent;
+  transition: all 0.2s ease;
+}
+
+.addCardPlaceholder:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+  background-color: var(--ring);
+}
+
+.addCardPlaceholder span {
+  font-weight: 600;
+}

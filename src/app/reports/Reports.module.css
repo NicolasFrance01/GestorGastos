@@ -1,0 +1,121 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+.header p {
+  color: #64748b;
+}
+
+.exportOptions {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .exportOptions {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.exportCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  gap: 1rem;
+  cursor: pointer;
+}
+
+.iconBox {
+  width: 64px;
+  height: 64px;
+  border-radius: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.5rem;
+}
+
+.exportCard h3 {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+.exportCard p {
+  color: #64748b;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.previewSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.previewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.previewHeader h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.count {
+  font-size: 0.8rem;
+  background-color: #f1f5f9;
+  padding: 0.25rem 0.75rem;
+  border-radius: 1rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.tableCard {
+  padding: 0;
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th {
+  padding: 1rem;
+  background-color: #f8fafc;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+
+.table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.income { color: var(--income); font-weight: 600; }
+.expense { color: var(--expense); font-weight: 600; }
+
+.moreInfo {
+  padding: 1rem;
+  text-align: center;
+  font-size: 0.8rem;
+  color: #94a3b8;
+  background-color: #f8fafc;
+}

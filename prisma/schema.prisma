@@ -1,0 +1,141 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  password      String?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+  
+  spaces        SpaceMember[]
+  createdSpaces Space[]   @relation("SpaceOwner")
+  reminders     Reminder[]
+  createdAt     DateTime  @default(now())
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Space {
+  id          String        @id @default(cuid())
+  name        String
+  ownerId     String
+  owner       User          @relation("SpaceOwner", fields: [ownerId], references: [id])
+  members     SpaceMember[]
+  transactions Transaction[]
+  categories  Category[]
+  wallets     Wallet[]
+  isPersonal  Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+}
+
+model SpaceMember {
+  id        String   @id @default(cuid())
+  spaceId   String
+  userId    String
+  role      String   @default("MEMBER") // OWNER, MEMBER
+  space     Space    @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([spaceId, userId])
+}
+
+model Wallet {
+  id          String        @id @default(cuid())
+  name        String
+  balance     Float         @default(0)
+  type        String        // DEBIT, CREDIT, CASH, etc.
+  category    String        // PERSONAL, BUSINESS, HOME
+  spaceId     String
+  space       Space         @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  createdAt   DateTime      @default(now())
+}
+
+model Category {
+  id           String          @id @default(cuid())
+  name         String
+  type         TransactionType
+  icon         String
+  color        String
+  spaceId      String
+  space        Space           @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+  createdAt    DateTime        @default(now())
+}
+
+model Transaction {
+  id          String          @id @default(cuid())
+  amount      Float
+  type        TransactionType
+  date        DateTime        @default(now())
+  description String?
+  tags        String?         // Comma separated or JSON
+  imageUrl    String?
+  categoryId  String
+  category    Category        @relation(fields: [categoryId], references: [id])
+  walletId    String?
+  wallet      Wallet?         @relation(fields: [walletId], references: [id])
+  spaceId     String
+  space       Space           @relation(fields: [spaceId], references: [id], onDelete: Cascade)
+  currency    String          @default("USD")
+  createdAt   DateTime        @default(now())
+}
+
+model Reminder {
+  id        String   @id @default(cuid())
+  title     String
+  amount    Float
+  frequency String   // DAILY, WEEKLY, MONTHLY
+  nextDate  DateTime
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}

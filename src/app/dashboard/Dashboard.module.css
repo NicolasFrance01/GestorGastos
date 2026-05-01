@@ -1,0 +1,241 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding-bottom: 2rem;
+}
+
+.balanceSection {
+  text-align: center;
+  padding: 1rem 0;
+}
+
+.balanceInfo h1 {
+  font-size: 1rem;
+  color: #64748b;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.mainBalance {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--foreground);
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.statCard {
+  background-color: var(--card);
+  padding: 1rem;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  box-shadow: var(--shadow);
+}
+
+.statIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.income {
+  background-color: #dcfce7;
+  color: var(--income);
+}
+
+.expense {
+  background-color: #fee2e2;
+  color: var(--expense);
+}
+
+.statInfo span {
+  font-size: 0.75rem;
+  color: #64748b;
+  font-weight: 600;
+}
+
+.statInfo p {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.chartCard {
+  padding: 1.5rem;
+}
+
+.cardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.cardHeader h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.periodTabs {
+  background-color: #f1f5f9;
+  padding: 0.2rem;
+  border-radius: 0.5rem;
+}
+
+.periodTabs button {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  border-radius: 0.4rem;
+  color: #64748b;
+}
+
+.activeTab {
+  background-color: white;
+  color: var(--primary) !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.actionBtn {
+  height: 3.5rem;
+  border-radius: 1.25rem;
+}
+
+.incomeBtn {
+  background-color: var(--income);
+}
+
+.expenseBtn {
+  background-color: var(--expense);
+}
+
+.recentSection {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sectionHeader h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.viewAll {
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.transactionList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.transactionItem {
+  background-color: var(--card);
+  padding: 1rem;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.txIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 1.2rem;
+}
+
+.txMain {
+  flex: 1;
+}
+
+.txTitle {
+  font-weight: 600;
+  color: var(--foreground);
+}
+
+.txDate {
+  font-size: 0.8rem;
+  color: #64748b;
+}
+
+.txAmount {
+  text-align: right;
+}
+
+.txAmount p {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.positive {
+  color: var(--income);
+}
+
+.negative {
+  color: var(--expense);
+}
+
+.txWallet {
+  font-size: 0.75rem;
+  color: #64748b;
+  background-color: #f1f5f9;
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+}
+
+.exportCard {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem;
+  background: linear-gradient(to right, #f8fafc, #f1f5f9);
+}
+
+.exportInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: #475569;
+}
+
+.exportInfo h3 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.exportInfo p {
+  font-size: 0.8rem;
+  color: #64748b;
+}
