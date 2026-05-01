@@ -1,17 +1,21 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
-import { Pool } from "@neondatabase/serverless";
+import { Pool, neonConfig } from "@neondatabase/serverless";
+import ws from "ws";
 
-if (!process.env.DATABASE_URL) {
-  console.error("DEBUG: DATABASE_URL is UNDEFINED or EMPTY");
-  throw new Error("DATABASE_URL is not set in environment variables");
+// Next.js 16/Vercel WebSocket compatibility
+neonConfig.webSocketConstructor = ws;
+
+const url = process.env.DATABASE_URL || process.env.POSTGRES_URL || process.env.NEON_DATABASE_URL;
+
+if (!url) {
+  console.error("DEBUG: ALL DATABASE URL VARIABLES ARE UNDEFINED");
+  throw new Error("No database connection string found in environment variables");
 }
 
-// Clean the string to avoid issues with accidental whitespace
-const connectionString = process.env.DATABASE_URL.trim();
-
-console.log(`DEBUG: DATABASE_URL detected. Length: ${connectionString.length}`);
-console.log(`DEBUG: Starts with postgres: ${connectionString.startsWith("postgres")}`);
+const connectionString = url.trim();
+console.log(`DEBUG: Connection string length: ${connectionString.length}`);
+console.log(`DEBUG: Protocol: ${connectionString.split(":")[0]}`);
 
 const pool = new Pool({ connectionString });
 const adapter = new PrismaNeon(pool as any);
