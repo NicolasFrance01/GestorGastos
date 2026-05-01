@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { TransactionType } from "@prisma/client";
+import type { TransactionType } from "@prisma/client";
 
 export async function POST(req: Request) {
   const session = await getServerSession(authOptions);
@@ -19,7 +19,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "Missing fields" }, { status: 400 });
     }
 
-    const transaction = await prisma.$transaction(async (tx) => {
+    // Using any for transaction context to resolve persistent IDE type detection issues
+    const transaction = await (prisma as any).$transaction(async (tx: any) => {
       const newTx = await tx.transaction.create({
         data: {
           amount: Number(amount),

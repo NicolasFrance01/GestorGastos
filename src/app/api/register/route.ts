@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { TransactionType } from "@prisma/client";
+import type { TransactionType } from "@prisma/client";
 
 export async function POST(req: Request) {
   try {
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ message: "User already exists" }, { status: 400 });
     }
 
-    const user = await prisma.$transaction(async (tx) => {
+    const user = await (prisma as any).$transaction(async (tx: any) => {
       const newUser = await tx.user.create({
         data: {
           name: String(name),
@@ -55,17 +55,17 @@ export async function POST(req: Request) {
       });
 
       const defaultCategories = [
-        { name: "Comida", type: TransactionType.EXPENSE, icon: "Utensils", color: "#ef4444" },
-        { name: "Transporte", type: TransactionType.EXPENSE, icon: "Car", color: "#3b82f6" },
-        { name: "Salario", type: TransactionType.INCOME, icon: "Wallet", color: "#10b981" },
-        { name: "Vivienda", type: TransactionType.EXPENSE, icon: "Home", color: "#f59e0b" },
+        { name: "Comida", type: "EXPENSE", icon: "Utensils", color: "#ef4444" },
+        { name: "Transporte", type: "EXPENSE", icon: "Car", color: "#3b82f6" },
+        { name: "Salario", type: "INCOME", icon: "Wallet", color: "#10b981" },
+        { name: "Vivienda", type: "EXPENSE", icon: "Home", color: "#f59e0b" },
       ];
 
       for (const cat of defaultCategories) {
         await tx.category.create({
           data: {
             name: cat.name,
-            type: cat.type,
+            type: cat.type as any,
             icon: cat.icon,
             color: cat.color,
             spaceId: personalSpace.id,
