@@ -7,7 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 type State = "loading" | "joining" | "success" | "error" | "unauthenticated";
 
 export default function JoinPage() {
-  const { data: session, status } = useSession();
+  const { status } = useSession();
   const params = useParams<{ spaceId: string; token: string }>();
   const router = useRouter();
   const [state, setState] = useState<State>("loading");
@@ -64,7 +64,7 @@ export default function JoinPage() {
             <button style={styles.btnPrimary} onClick={() => signIn(undefined, { callbackUrl })}>
               Iniciar sesión
             </button>
-            <button style={styles.btnSecondary} onClick={() => router.push(`/auth/register?callbackUrl=${encodeURIComponent(callbackUrl)}`)}>
+            <button style={styles.btnSecondary} onClick={() => router.push(`/register?callbackUrl=${encodeURIComponent(callbackUrl)}`)}>
               Crear cuenta
             </button>
           </>
