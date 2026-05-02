@@ -12,12 +12,22 @@
   --border: #e2e8f0;
   --ring: rgba(16, 185, 129, 0.2);
   --radius: 1rem;
-  
+
   --income: #10b981;
   --expense: #ef4444;
-  
+
   --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+
+  /* Aliases used by component CSS modules */
+  --color-primary: #10b981;
+  --color-surface: #ffffff;
+  --color-surface-alt: #f1f5f9;
+  --color-text: #0f172a;
+  --color-text-muted: #64748b;
+  --color-border: #e2e8f0;
+  --color-expense: #ef4444;
+  --color-income: #10b981;
 }
 
 [data-theme='dark'] {
@@ -27,6 +37,12 @@
   --card-foreground: #f8fafc;
   --border: #334155;
   --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+
+  --color-surface: #1e293b;
+  --color-surface-alt: #0f172a;
+  --color-text: #f8fafc;
+  --color-text-muted: #94a3b8;
+  --color-border: #334155;
 }
 
 * {

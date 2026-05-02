@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
-import { X, UserPlus, Trash2, Crown, User } from "lucide-react";
+import { X, UserPlus, Trash2, Crown, User, Link, Copy, Check } from "lucide-react";
 import styles from "./SpaceModal.module.css";
 import { clsx } from "clsx";
 
@@ -29,6 +29,8 @@ export const SpaceModal = ({ isOpen, onClose, onSpaceCreated, activeSpaceId, cur
   const [members, setMembers] = useState<Member[]>([]);
   const [isCreating, setIsCreating] = useState(false);
   const [isInviting, setIsInviting] = useState(false);
+  const [isCopying, setIsCopying] = useState(false);
+  const [copied, setCopied] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -101,6 +103,22 @@ export const SpaceModal = ({ isOpen, onClose, onSpaceCreated, activeSpaceId, cur
     }
   };
 
+  const handleCopyLink = async () => {
+    if (!activeSpaceId) return;
+    setIsCopying(true);
+    try {
+      const res = await fetch(`/api/spaces/${activeSpaceId}/invite-link`);
+      const data = await res.json();
+      await navigator.clipboard.writeText(data.url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 3000);
+    } catch {
+      setError("No se pudo generar el enlace");
+    } finally {
+      setIsCopying(false);
+    }
+  };
+
   const handleRemoveMember = async (userId: string) => {
     try {
       await fetch(`/api/spaces/${activeSpaceId}/members/${userId}`, { method: "DELETE" });
@@ -161,6 +179,23 @@ export const SpaceModal = ({ isOpen, onClose, onSpaceCreated, activeSpaceId, cur
 
           {tab === "members" && (
             <div className={styles.membersSection}>
+              <div className={styles.linkSection}>
+                <div className={styles.linkInfo}>
+                  <Link size={16} />
+                  <span>Invitar por enlace</span>
+                </div>
+                <button
+                  className={clsx(styles.copyBtn, copied && styles.copiedBtn)}
+                  onClick={handleCopyLink}
+                  disabled={isCopying}
+                >
+                  {copied ? <Check size={15} /> : <Copy size={15} />}
+                  {copied ? "¡Copiado!" : isCopying ? "..." : "Copiar enlace"}
+                </button>
+              </div>
+
+              <div className={styles.dividerRow}><span>o invitar por correo</span></div>
+
               <form onSubmit={handleInvite} className={styles.inviteRow}>
                 <input
                   type="email"

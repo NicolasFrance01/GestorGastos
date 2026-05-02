@@ -152,6 +152,65 @@
   gap: 1rem;
 }
 
+.linkSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: var(--color-surface-alt);
+  border-radius: 12px;
+  gap: 0.75rem;
+}
+
+.linkInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.copyBtn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  border: none;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+
+.copyBtn:hover { opacity: 0.9; }
+.copyBtn:disabled { opacity: 0.6; cursor: default; }
+
+.copiedBtn {
+  background: #10b981;
+}
+
+.dividerRow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+}
+
+.dividerRow::before,
+.dividerRow::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
 .inviteRow {
   display: flex;
   gap: 0.5rem;
