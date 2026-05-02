@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { PrismaNeon } from "@prisma/adapter-neon";
-import { Pool } from "@neondatabase/serverless";
 
 function createPrismaClient() {
   const url = (
@@ -16,8 +15,9 @@ function createPrismaClient() {
     );
   }
 
-  const pool = new Pool({ connectionString: url });
-  const adapter = new PrismaNeon(pool as any);
+  // In Prisma 7, PrismaNeon is a factory that takes a config object (not a Pool instance).
+  // It creates the Pool internally when Prisma calls adapter.connect().
+  const adapter = new PrismaNeon({ connectionString: url });
 
   return new PrismaClient({
     adapter,
