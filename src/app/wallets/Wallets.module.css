@@ -64,8 +64,36 @@
 .credit { background-color: #fee2e2; color: #ef4444; }
 .cash { background-color: #dcfce7; color: #10b981; }
 
-.moreBtn {
-  color: #94a3b8;
+.cardActions {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.actionBtn {
+  background: var(--color-surface-alt, #f1f5f9);
+  border: none;
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.15s;
+}
+
+.actionBtn:hover { color: var(--foreground); }
+
+.deleteBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.loading {
+  text-align: center;
+  color: #64748b;
+  padding: 2rem;
 }
 
 .walletInfo h3 {

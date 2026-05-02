@@ -123,12 +123,16 @@
   color: #64748b;
 }
 
-.field select {
+.field select, .select {
   padding: 0.75rem;
   border: 1px solid var(--border);
   border-radius: 0.75rem;
   outline: none;
-  background-color: white;
+  background-color: var(--card, white);
+  color: var(--foreground);
+  font-family: inherit;
+  font-size: 0.9rem;
+  width: 100%;
 }
 
 .categoryGrid {

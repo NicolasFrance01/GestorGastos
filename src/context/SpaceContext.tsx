@@ -14,6 +14,7 @@ interface SpaceContextType {
   spaces: Space[];
   setActiveSpace: (space: Space) => void;
   isLoading: boolean;
+  refreshSpaces: () => Promise<void>;
 }
 
 const SpaceContext = createContext<SpaceContextType | undefined>(undefined);
@@ -46,7 +47,7 @@ export const SpaceProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <SpaceContext.Provider value={{ activeSpace, spaces, setActiveSpace, isLoading }}>
+    <SpaceContext.Provider value={{ activeSpace, spaces, setActiveSpace, isLoading, refreshSpaces: fetchSpaces }}>
       {children}
     </SpaceContext.Provider>
   );

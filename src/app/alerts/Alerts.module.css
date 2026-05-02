@@ -66,20 +66,71 @@
   gap: 0.25rem;
 }
 
-.amount {
+.right {
   display: flex;
-  align-items: center;
-  gap: 1rem;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
 }
 
-.amount p {
-  font-size: 1.25rem;
+.amount {
+  font-size: 1.1rem;
   font-weight: 800;
   color: var(--foreground);
 }
 
-.more {
+.actions {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.actionBtn {
+  background: var(--color-surface-alt, #f1f5f9);
+  border: none;
+  border-radius: 8px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #64748b;
+  transition: all 0.15s;
+}
+
+.actionBtn:hover { color: var(--foreground); }
+
+.deleteBtn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.loading {
+  text-align: center;
+  color: #64748b;
+  padding: 2rem;
+}
+
+.addCard {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: 16px;
+  border: 2px dashed var(--border, #e2e8f0);
+  background: transparent;
   color: #94a3b8;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
+  width: 100%;
+}
+
+.addCard:hover {
+  border-color: var(--primary);
+  color: var(--primary);
 }
 
 .empty {

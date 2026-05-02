@@ -1,7 +1,8 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: 2rem;
+  gap: 1.5rem;
+  padding: 1.25rem;
   padding-bottom: 2rem;
 }
 
@@ -87,23 +88,38 @@
 }
 
 .periodTabs {
-  background-color: #f1f5f9;
-  padding: 0.2rem;
-  border-radius: 0.5rem;
+  display: flex;
+  background: var(--color-surface-alt, #f1f5f9);
+  padding: 0.25rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
 }
 
-.periodTabs button {
-  padding: 0.4rem 0.8rem;
-  font-size: 0.8rem;
+.periodTab {
+  flex: 1;
+  padding: 0.45rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  border-radius: 0.4rem;
-  color: #64748b;
+  border-radius: 10px;
+  color: var(--color-text-muted, #64748b);
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.15s;
+  font-family: inherit;
 }
 
 .activeTab {
-  background-color: white;
-  color: var(--primary) !important;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  background: var(--color-surface, white);
+  color: var(--color-primary, #1a7a4a) !important;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.chartLoading, .chartEmpty {
+  text-align: center;
+  color: var(--color-text-muted, #64748b);
+  padding: 2rem 0;
+  font-size: 0.9rem;
 }
 
 .actions {
@@ -213,6 +229,51 @@
   background-color: #f1f5f9;
   padding: 0.1rem 0.4rem;
   border-radius: 0.25rem;
+}
+
+.chartSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.txRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.35rem;
+}
+
+.txActions {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.txBtn {
+  background: var(--color-surface-alt, #f1f5f9);
+  border: none;
+  border-radius: 6px;
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #94a3b8;
+  transition: all 0.15s;
+}
+
+.txBtn:hover { color: var(--foreground); }
+
+.txDelete:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.emptyTx {
+  text-align: center;
+  color: #94a3b8;
+  padding: 1.5rem 0;
+  font-size: 0.9rem;
 }
 
 .exportCard {

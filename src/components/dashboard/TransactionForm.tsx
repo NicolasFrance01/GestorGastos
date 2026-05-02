@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
-import { X, Camera, Tag, MessageSquare, CreditCard } from "lucide-react";
+import { X, MessageSquare, CreditCard, CalendarDays } from "lucide-react";
+import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import styles from "./TransactionForm.module.css";
 import { clsx } from "clsx";
 
@@ -19,23 +19,36 @@ interface Wallet {
   name: string;
 }
 
-export const TransactionForm = ({ 
-  isOpen, 
-  onClose, 
+interface TransactionInitial {
+  id: string;
+  amount: number;
+  type: string;
+  description: string;
+  date: string;
+  category: { name: string; color: string; icon: string };
+  wallet?: { name: string };
+}
+
+export const TransactionForm = ({
+  isOpen,
+  onClose,
   type: initialType = "EXPENSE",
-  spaceId 
-}: { 
-  isOpen: boolean; 
+  spaceId,
+  initial,
+}: {
+  isOpen: boolean;
   onClose: () => void;
   type?: "EXPENSE" | "INCOME";
   spaceId?: string;
+  initial?: TransactionInitial;
 }) => {
-  const [type, setType] = useState(initialType);
+  const isEdit = !!initial?.id;
+  const [type, setType] = useState<"EXPENSE" | "INCOME">(initialType);
   const [amount, setAmount] = useState("");
   const [categoryId, setCategoryId] = useState("");
   const [walletId, setWalletId] = useState("");
   const [description, setDescription] = useState("");
-  const [tags, setTags] = useState("");
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [categories, setCategories] = useState<Category[]>([]);
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -44,7 +57,21 @@ export const TransactionForm = ({
     if (isOpen && spaceId) {
       fetchData();
     }
-  }, [isOpen, spaceId]);
+  }, [isOpen, spaceId, type]);
+
+  useEffect(() => {
+    if (initial) {
+      setType(initial.type as "EXPENSE" | "INCOME");
+      setAmount(String(initial.amount));
+      setDescription(initial.description || "");
+      setDate(initial.date ? initial.date.slice(0, 10) : new Date().toISOString().slice(0, 10));
+    } else {
+      setAmount("");
+      setDescription("");
+      setDate(new Date().toISOString().slice(0, 10));
+      setCategoryId("");
+    }
+  }, [initial, isOpen]);
 
   const fetchData = async () => {
     try {
@@ -52,10 +79,11 @@ export const TransactionForm = ({
         fetch(`/api/categories?spaceId=${spaceId}&type=${type}`),
         fetch(`/api/wallets?spaceId=${spaceId}`)
       ]);
-      setCategories(await catsRes.json());
+      const cats = await catsRes.json();
       const wData = await walletsRes.json();
-      setWallets(wData);
-      if (wData.length > 0) setWalletId(wData[0].id);
+      setCategories(Array.isArray(cats) ? cats : []);
+      setWallets(Array.isArray(wData) ? wData : []);
+      if (wData.length > 0 && !walletId) setWalletId(wData[0].id);
     } catch (error) {
       console.error(error);
     }
@@ -65,8 +93,10 @@ export const TransactionForm = ({
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await fetch("/api/transactions", {
-        method: "POST",
+      const url = isEdit ? `/api/transactions/${initial!.id}` : "/api/transactions";
+      const method = isEdit ? "PUT" : "POST";
+      const res = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: parseFloat(amount),
@@ -74,15 +104,15 @@ export const TransactionForm = ({
           categoryId,
           walletId,
           description,
-          tags,
-          spaceId
-        })
+          date,
+          spaceId,
+        }),
       });
       if (res.ok) {
         onClose();
-        // Reset form
         setAmount("");
         setDescription("");
+        setCategoryId("");
       }
     } catch (error) {
       console.error(error);
@@ -98,13 +128,13 @@ export const TransactionForm = ({
       <div className={styles.modal}>
         <header className={styles.header}>
           <div className={styles.typeSwitcher}>
-            <button 
+            <button
               className={clsx(styles.typeBtn, type === "EXPENSE" && styles.activeExpense)}
               onClick={() => setType("EXPENSE")}
             >
               Gasto
             </button>
-            <button 
+            <button
               className={clsx(styles.typeBtn, type === "INCOME" && styles.activeIncome)}
               onClick={() => setType("INCOME")}
             >
@@ -117,23 +147,35 @@ export const TransactionForm = ({
         <form onSubmit={handleSubmit} className={styles.form}>
           <div className={styles.amountSection}>
             <span className={styles.currency}>$</span>
-            <input 
-              type="number" 
-              placeholder="0.00" 
+            <input
+              type="number"
+              placeholder="0.00"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               className={styles.amountInput}
               autoFocus
               required
+              step="0.01"
+              min="0"
             />
           </div>
 
           <div className={styles.grid}>
             <div className={styles.field}>
-              <label><CreditCard size={18} /> Cuenta</label>
-              <select value={walletId} onChange={(e) => setWalletId(e.target.value)} required>
+              <label><CreditCard size={16} /> Cuenta</label>
+              <select value={walletId} onChange={(e) => setWalletId(e.target.value)} className={styles.select}>
                 {wallets.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
               </select>
+            </div>
+
+            <div className={styles.field}>
+              <label><CalendarDays size={16} /> Fecha</label>
+              <input
+                type="date"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                className={styles.select}
+              />
             </div>
 
             <div className={styles.field}>
@@ -147,7 +189,9 @@ export const TransactionForm = ({
                     style={{ "--cat-color": cat.color } as any}
                     onClick={() => setCategoryId(cat.id)}
                   >
-                    <div className={styles.catIcon}>{cat.name[0]}</div>
+                    <div className={styles.catIcon}>
+                      <CategoryIcon name={cat.icon} size={16} color="#fff" />
+                    </div>
                     <span>{cat.name}</span>
                   </button>
                 ))}
@@ -156,32 +200,17 @@ export const TransactionForm = ({
           </div>
 
           <div className={styles.inputGroup}>
-            <Tag size={18} />
-            <input 
-              type="text" 
-              placeholder="Etiquetas (separadas por coma)" 
-              value={tags}
-              onChange={(e) => setTags(e.target.value)}
-            />
-          </div>
-
-          <div className={styles.inputGroup}>
             <MessageSquare size={18} />
-            <textarea 
-              placeholder="Nota o comentario..." 
+            <input
+              type="text"
+              placeholder="Nota o descripción..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
 
-          <div className={styles.photoSection}>
-            <Button type="button" variant="outline" className={styles.photoBtn}>
-              <Camera size={20} /> Adjuntar Foto
-            </Button>
-          </div>
-
           <Button type="submit" className={styles.submitBtn} isLoading={isLoading}>
-            Añadir Transacción
+            {isEdit ? "Guardar cambios" : "Añadir Transacción"}
           </Button>
         </form>
       </div>

@@ -2,23 +2,26 @@
 
 import { useSpace } from "@/context/SpaceContext";
 import { useSession, signOut } from "next-auth/react";
-import { LayoutDashboard, Wallet, PieChart, Bell, Settings, LogOut, ChevronDown, Plus } from "lucide-react";
+import { LayoutDashboard, Wallet, PieChart, Bell, Tag, ChevronDown, Plus, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./Shell.module.css";
 import { useState } from "react";
 import { clsx } from "clsx";
+import { SpaceModal } from "@/components/spaces/SpaceModal";
 
 export const Shell = ({ children }: { children: React.ReactNode }) => {
-  const { activeSpace, spaces, setActiveSpace } = useSpace();
+  const { activeSpace, spaces, setActiveSpace, refreshSpaces } = useSpace();
   const { data: session } = useSession();
   const pathname = usePathname();
   const [isSpaceMenuOpen, setIsSpaceMenuOpen] = useState(false);
+  const [isSpaceModalOpen, setIsSpaceModalOpen] = useState(false);
 
   const navItems = [
     { name: "Resumen", icon: LayoutDashboard, href: "/dashboard" },
     { name: "Cuentas", icon: Wallet, href: "/wallets" },
     { name: "Informes", icon: PieChart, href: "/reports" },
+    { name: "Categorías", icon: Tag, href: "/categories" },
     { name: "Alertas", icon: Bell, href: "/alerts" },
   ];
 
@@ -27,7 +30,7 @@ export const Shell = ({ children }: { children: React.ReactNode }) => {
       <header className={styles.header}>
         <div className={styles.headerContent}>
           <div className={styles.spaceSwitcher}>
-            <button 
+            <button
               className={styles.activeSpaceBtn}
               onClick={() => setIsSpaceMenuOpen(!isSpaceMenuOpen)}
             >
@@ -56,9 +59,26 @@ export const Shell = ({ children }: { children: React.ReactNode }) => {
                   </button>
                 ))}
                 <div className={styles.divider} />
-                <button className={styles.addSpaceBtn}>
+                <button
+                  className={styles.addSpaceBtn}
+                  onClick={() => {
+                    setIsSpaceMenuOpen(false);
+                    setIsSpaceModalOpen(true);
+                  }}
+                >
                   <Plus size={16} /> Nuevo Espacio
                 </button>
+                {activeSpace && (
+                  <button
+                    className={styles.addSpaceBtn}
+                    onClick={() => {
+                      setIsSpaceMenuOpen(false);
+                      setIsSpaceModalOpen(true);
+                    }}
+                  >
+                    Gestionar miembros
+                  </button>
+                )}
               </div>
             )}
           </div>
@@ -79,16 +99,24 @@ export const Shell = ({ children }: { children: React.ReactNode }) => {
 
       <nav className={styles.bottomNav}>
         {navItems.map((item) => (
-          <Link 
-            key={item.href} 
+          <Link
+            key={item.href}
             href={item.href}
             className={clsx(styles.navItem, pathname === item.href && styles.activeNav)}
           >
-            <item.icon size={24} />
+            <item.icon size={22} />
             <span>{item.name}</span>
           </Link>
         ))}
       </nav>
+
+      <SpaceModal
+        isOpen={isSpaceModalOpen}
+        onClose={() => setIsSpaceModalOpen(false)}
+        onSpaceCreated={refreshSpaces}
+        activeSpaceId={activeSpace?.id}
+        currentUserId={session?.user?.id}
+      />
     </div>
   );
 };
