@@ -118,21 +118,27 @@
   font-weight: 600;
 }
 
-.logoutBtn {
-  padding: 0.5rem;
-  color: #64748b;
+.profileAvatar {
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  background: var(--primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  text-decoration: none;
+  transition: opacity 0.15s;
 }
 
-.logoutBtn:hover {
-  background-color: #fee2e2;
-  color: #ef4444;
-}
+.profileAvatar:hover { opacity: 0.85; }
 
 .main {
   flex: 1;
-  padding: 1.5rem;
+  padding: 0;
 }
 
 .content {

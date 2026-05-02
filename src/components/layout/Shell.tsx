@@ -1,8 +1,8 @@
 "use client";
 
 import { useSpace } from "@/context/SpaceContext";
-import { useSession, signOut } from "next-auth/react";
-import { LayoutDashboard, Wallet, PieChart, Bell, Tag, ChevronDown, Plus, LogOut } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { LayoutDashboard, Wallet, PieChart, Bell, Tag, ChevronDown, Plus } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import styles from "./Shell.module.css";
@@ -84,9 +84,9 @@ export const Shell = ({ children }: { children: React.ReactNode }) => {
           </div>
 
           <div className={styles.userProfile}>
-            <button onClick={() => signOut()} className={styles.logoutBtn}>
-              <LogOut size={20} />
-            </button>
+            <Link href="/profile" className={styles.profileAvatar}>
+              {(session?.user?.name || session?.user?.email || "?")[0].toUpperCase()}
+            </Link>
           </div>
         </div>
       </header>
