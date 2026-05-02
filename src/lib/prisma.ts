@@ -10,6 +10,12 @@ function createPrismaClient() {
     ""
   ).trim();
 
+  if (!url) {
+    throw new Error(
+      "DATABASE_URL is not set. Add it to Vercel environment variables or your .env file."
+    );
+  }
+
   const pool = new Pool({ connectionString: url });
   const adapter = new PrismaNeon(pool as any);
 
