@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
-import { X, MessageSquare, CreditCard, CalendarDays } from "lucide-react";
+import { X, MessageSquare, CreditCard, CalendarDays, Plus } from "lucide-react";
 import { CategoryIcon } from "@/components/ui/CategoryIcon";
 import styles from "./TransactionForm.module.css";
 import { clsx } from "clsx";
@@ -24,6 +24,16 @@ function formatAmount(raw: string): { display: string; numeric: string } {
   return { display, numeric };
 }
 
+const CAT_ICONS = ["Tag","Utensils","Car","Home","ShoppingBag","Heart","Briefcase","Plane","Coffee","Gamepad2","BookOpen","Music","Dumbbell","Gift","Zap","Wallet"];
+const CAT_COLORS = ["#ef4444","#f97316","#eab308","#10b981","#3b82f6","#8b5cf6","#ec4899","#06b6d4","#84cc16","#64748b"];
+const WALLET_TYPES = [
+  { value: "CASH", label: "Efectivo" },
+  { value: "DEBIT", label: "Débito" },
+  { value: "CREDIT", label: "Crédito" },
+  { value: "SAVINGS", label: "Ahorros" },
+  { value: "INVESTMENT", label: "Inversión" },
+];
+
 export const TransactionForm = ({
   isOpen, onClose, type: initialType = "EXPENSE", spaceId, initial,
 }: {
@@ -42,6 +52,19 @@ export const TransactionForm = ({
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
+  // Nueva categoría inline
+  const [showNewCat, setShowNewCat] = useState(false);
+  const [newCatName, setNewCatName] = useState("");
+  const [newCatIcon, setNewCatIcon] = useState("Tag");
+  const [newCatColor, setNewCatColor] = useState("#10b981");
+  const [savingCat, setSavingCat] = useState(false);
+
+  // Nueva cuenta inline
+  const [showNewWallet, setShowNewWallet] = useState(false);
+  const [newWalletName, setNewWalletName] = useState("");
+  const [newWalletType, setNewWalletType] = useState("CASH");
+  const [savingWallet, setSavingWallet] = useState(false);
+
   useEffect(() => { if (isOpen && spaceId) fetchData(); }, [isOpen, spaceId, type]);
 
   useEffect(() => {
@@ -59,7 +82,17 @@ export const TransactionForm = ({
       setDate(new Date().toISOString().slice(0, 10));
       setCategoryId("");
     }
+    setShowNewCat(false);
+    setShowNewWallet(false);
   }, [initial, isOpen]);
+
+  // Al editar, pre-seleccionar categoría por nombre cuando carguen las categorías
+  useEffect(() => {
+    if (isEdit && initial && categories.length > 0) {
+      const match = categories.find(c => c.name === initial.category.name);
+      if (match) setCategoryId(match.id);
+    }
+  }, [initial, categories]);
 
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { display, numeric } = formatAmount(e.target.value);
@@ -78,7 +111,61 @@ export const TransactionForm = ({
       setCategories(Array.isArray(cats) ? cats : []);
       setWallets(Array.isArray(wData) ? wData : []);
       if (wData.length > 0 && !walletId) setWalletId(wData[0].id);
+      if (!isEdit && cats.length > 0) setCategoryId(cats[0].id);
     } catch (error) { console.error(error); }
+  };
+
+  const handleWalletChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    if (e.target.value === "__new__") {
+      setShowNewWallet(true);
+      setWalletId("");
+    } else {
+      setWalletId(e.target.value);
+      setShowNewWallet(false);
+    }
+  };
+
+  const createCategory = async () => {
+    if (!newCatName.trim()) return;
+    setSavingCat(true);
+    try {
+      const res = await fetch("/api/categories", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newCatName.trim(), type, icon: newCatIcon, color: newCatColor, spaceId }),
+      });
+      if (res.ok) {
+        const cat = await res.json();
+        setCategories(prev => [...prev, cat]);
+        setCategoryId(cat.id);
+        setShowNewCat(false);
+        setNewCatName("");
+        setNewCatIcon("Tag");
+        setNewCatColor("#10b981");
+      }
+    } catch (error) { console.error(error); }
+    finally { setSavingCat(false); }
+  };
+
+  const createWallet = async () => {
+    if (!newWalletName.trim()) return;
+    setSavingWallet(true);
+    try {
+      const res = await fetch("/api/wallets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: newWalletName.trim(), type: newWalletType, category: "PERSONAL", balance: 0, spaceId }),
+      });
+      if (res.ok) {
+        const w = await res.json();
+        setWallets(prev => [...prev, w]);
+        setWalletId(w.id);
+        setShowNewWallet(false);
+        setNewWalletName("");
+        setNewWalletType("CASH");
+      }
+    } catch (error) { console.error(error); }
+    finally { setSavingWallet(false); }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -126,18 +213,55 @@ export const TransactionForm = ({
           </div>
 
           <div className={styles.grid}>
+            {/* Cuenta */}
             <div className={styles.field}>
               <label><CreditCard size={16} /> Cuenta</label>
-              <select value={walletId} onChange={(e) => setWalletId(e.target.value)} className={styles.select}>
+              <select
+                value={showNewWallet ? "__new__" : walletId}
+                onChange={handleWalletChange}
+                className={styles.select}
+              >
                 {wallets.map(w => <option key={w.id} value={w.id}>{w.name}</option>)}
+                <option value="__new__">+ Nueva Cuenta</option>
               </select>
+              {showNewWallet && (
+                <div className={styles.inlineForm}>
+                  <input
+                    type="text"
+                    placeholder="Nombre de la cuenta"
+                    value={newWalletName}
+                    onChange={e => setNewWalletName(e.target.value)}
+                    className={styles.inlineInput}
+                  />
+                  <select value={newWalletType} onChange={e => setNewWalletType(e.target.value)} className={styles.inlineSelect}>
+                    {WALLET_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                  </select>
+                  <div className={styles.inlineActions}>
+                    <button type="button" className={styles.inlineSave} onClick={createWallet} disabled={savingWallet}>
+                      {savingWallet ? "..." : "Crear"}
+                    </button>
+                    <button type="button" className={styles.inlineCancel} onClick={() => { setShowNewWallet(false); setWalletId(wallets[0]?.id || ""); }}>
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
+
+            {/* Fecha */}
             <div className={styles.field}>
               <label><CalendarDays size={16} /> Fecha</label>
               <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className={styles.select} />
             </div>
+
+            {/* Categoría */}
             <div className={styles.field}>
-              <label>Categoría</label>
+              <div className={styles.catHeader}>
+                <label>Categoría</label>
+                <button type="button" className={styles.newCatBtn} onClick={() => setShowNewCat(!showNewCat)}>
+                  <Plus size={14} /> Nueva
+                </button>
+              </div>
               <div className={styles.categoryGrid}>
                 {categories.map(cat => (
                   <button key={cat.id} type="button"
@@ -150,6 +274,46 @@ export const TransactionForm = ({
                   </button>
                 ))}
               </div>
+
+              {showNewCat && (
+                <div className={styles.inlineForm}>
+                  <input
+                    type="text"
+                    placeholder="Nombre de la categoría"
+                    value={newCatName}
+                    onChange={e => setNewCatName(e.target.value)}
+                    className={styles.inlineInput}
+                  />
+                  <div className={styles.iconPicker}>
+                    {CAT_ICONS.map(icon => (
+                      <button key={icon} type="button"
+                        className={clsx(styles.iconOption, newCatIcon === icon && styles.iconSelected)}
+                        style={{ backgroundColor: newCatIcon === icon ? newCatColor : undefined }}
+                        onClick={() => setNewCatIcon(icon)}
+                      >
+                        <CategoryIcon name={icon} size={14} color={newCatIcon === icon ? "#fff" : "#64748b"} />
+                      </button>
+                    ))}
+                  </div>
+                  <div className={styles.colorPicker}>
+                    {CAT_COLORS.map(color => (
+                      <button key={color} type="button"
+                        className={clsx(styles.colorDot, newCatColor === color && styles.colorSelected)}
+                        style={{ backgroundColor: color }}
+                        onClick={() => setNewCatColor(color)}
+                      />
+                    ))}
+                  </div>
+                  <div className={styles.inlineActions}>
+                    <button type="button" className={styles.inlineSave} onClick={createCategory} disabled={savingCat}>
+                      {savingCat ? "..." : "Crear"}
+                    </button>
+                    <button type="button" className={styles.inlineCancel} onClick={() => { setShowNewCat(false); setNewCatName(""); }}>
+                      Cancelar
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

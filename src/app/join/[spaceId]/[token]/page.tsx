@@ -3,11 +3,13 @@
 import { useEffect, useState } from "react";
 import { useSession, signIn } from "next-auth/react";
 import { useParams, useRouter } from "next/navigation";
+import { useSpace } from "@/context/SpaceContext";
 
 type State = "loading" | "joining" | "success" | "error" | "unauthenticated";
 
 export default function JoinPage() {
   const { status } = useSession();
+  const { refreshSpaces } = useSpace();
   const params = useParams<{ spaceId: string; token: string }>();
   const router = useRouter();
   const [state, setState] = useState<State>("loading");
@@ -33,6 +35,7 @@ export default function JoinPage() {
       if (res.ok || res.status === 200) {
         setMessage(data.message);
         setState("success");
+        await refreshSpaces();
         setTimeout(() => router.push("/dashboard"), 2000);
       } else {
         setMessage(data.message || "Error al unirse");

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import styles from "../login/Login.module.css";
@@ -10,11 +11,18 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (password !== confirmPassword) {
+      alert("Las contraseñas no coinciden");
+      return;
+    }
     setIsLoading(true);
 
     try {
@@ -67,13 +75,33 @@ export default function RegisterPage() {
           </div>
           <div className={styles.inputGroup}>
             <label>Contraseña</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="••••••••"
-            />
+            <div className={styles.passwordWrapper}>
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+              />
+              <button type="button" className={styles.eyeBtn} onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+          <div className={styles.inputGroup}>
+            <label>Confirmar Contraseña</label>
+            <div className={styles.passwordWrapper}>
+              <input
+                type={showConfirm ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+              />
+              <button type="button" className={styles.eyeBtn} onClick={() => setShowConfirm(!showConfirm)}>
+                {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
           <Button type="submit" isLoading={isLoading} className={styles.submitBtn}>
             Registrarse

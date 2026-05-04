@@ -1,11 +1,11 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Shell } from "@/components/layout/Shell";
 import { useSpace } from "@/context/SpaceContext";
 import { Card } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Download, FileSpreadsheet, File as FilePdf } from "lucide-react";
+import { FileSpreadsheet, File as FilePdf } from "lucide-react";
 import styles from "./Reports.module.css";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
@@ -25,11 +25,12 @@ interface Transaction {
 export default function ReportsPage() {
   const { activeSpace } = useSpace();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [typeFilter, setTypeFilter] = useState<"ALL" | "INCOME" | "EXPENSE">("ALL");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   useEffect(() => {
-    if (activeSpace) {
-      fetchTransactions();
-    }
+    if (activeSpace) fetchTransactions();
   }, [activeSpace]);
 
   const fetchTransactions = async () => {
@@ -42,15 +43,23 @@ export default function ReportsPage() {
     }
   };
 
+  const filtered = useMemo(() => {
+    return transactions.filter(t => {
+      if (typeFilter !== "ALL" && t.type !== typeFilter) return false;
+      if (dateFrom && new Date(t.date) < new Date(dateFrom)) return false;
+      if (dateTo && new Date(t.date) > new Date(dateTo + "T23:59:59")) return false;
+      return true;
+    });
+  }, [transactions, typeFilter, dateFrom, dateTo]);
+
   const exportToExcel = () => {
-    const ws = XLSX.utils.json_to_sheet(transactions.map(t => ({
+    const ws = XLSX.utils.json_to_sheet(filtered.map(t => ({
       Fecha: new Date(t.date).toLocaleDateString(),
-      Tipo: t.type,
+      Tipo: t.type === "INCOME" ? "Ingreso" : "Gasto",
       Monto: t.amount,
       Categoría: t.category.name,
       Cuenta: t.wallet?.name || "N/A",
       Descripción: t.description || "",
-      Etiquetas: t.tags || ""
     })));
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Movimientos");
@@ -61,13 +70,13 @@ export default function ReportsPage() {
     const doc = new jsPDF();
     doc.text(`Reporte de Gastos - ${activeSpace?.name}`, 14, 15);
     (doc as any).autoTable({
-      head: [['Fecha', 'Tipo', 'Categoría', 'Monto', 'Cuenta']],
-      body: transactions.map(t => [
+      head: [["Fecha", "Tipo", "Categoría", "Monto", "Cuenta"]],
+      body: filtered.map(t => [
         new Date(t.date).toLocaleDateString(),
-        t.type,
+        t.type === "INCOME" ? "Ingreso" : "Gasto",
         t.category.name,
-        `$${t.amount}`,
-        t.wallet?.name || "N/A"
+        `$${t.amount.toLocaleString()}`,
+        t.wallet?.name || "N/A",
       ]),
       startY: 20,
     });
@@ -105,8 +114,31 @@ export default function ReportsPage() {
         <section className={styles.previewSection}>
           <div className={styles.previewHeader}>
             <h2>Vista Previa</h2>
-            <div className={styles.count}>{transactions.length} movimientos</div>
+            <div className={styles.count}>{filtered.length} movimientos</div>
           </div>
+
+          <div className={styles.filters}>
+            <div className={styles.typeToggle}>
+              {(["ALL", "INCOME", "EXPENSE"] as const).map(t => (
+                <button
+                  key={t}
+                  className={`${styles.toggleBtn} ${typeFilter === t ? styles.toggleActive : ""}`}
+                  onClick={() => setTypeFilter(t)}
+                >
+                  {t === "ALL" ? "Todos" : t === "INCOME" ? "Ingresos" : "Gastos"}
+                </button>
+              ))}
+            </div>
+            <div className={styles.dateRange}>
+              <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className={styles.dateInput} placeholder="Desde" />
+              <span className={styles.dateSep}>—</span>
+              <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className={styles.dateInput} placeholder="Hasta" />
+              {(dateFrom || dateTo) && (
+                <button className={styles.clearBtn} onClick={() => { setDateFrom(""); setDateTo(""); }}>✕</button>
+              )}
+            </div>
+          </div>
+
           <Card className={styles.tableCard}>
             <table className={styles.table}>
               <thead>
@@ -118,20 +150,23 @@ export default function ReportsPage() {
                 </tr>
               </thead>
               <tbody>
-                {transactions.slice(0, 10).map((t) => (
+                {filtered.slice(0, 50).map((t) => (
                   <tr key={t.id}>
-                    <td>{new Date(t.date).toLocaleDateString()}</td>
+                    <td>{new Date(t.date).toLocaleDateString("es-AR")}</td>
                     <td>{t.category.name}</td>
-                    <td>${t.amount.toLocaleString()}</td>
+                    <td>${t.amount.toLocaleString("es-AR", { minimumFractionDigits: 2 })}</td>
                     <td className={t.type === "INCOME" ? styles.income : styles.expense}>
-                      {t.type}
+                      {t.type === "INCOME" ? "Ingreso" : "Gasto"}
                     </td>
                   </tr>
                 ))}
+                {filtered.length === 0 && (
+                  <tr><td colSpan={4} style={{ textAlign: "center", color: "#94a3b8", padding: "2rem" }}>Sin movimientos</td></tr>
+                )}
               </tbody>
             </table>
-            {transactions.length > 10 && (
-              <div className={styles.moreInfo}>Y {transactions.length - 10} movimientos más...</div>
+            {filtered.length > 50 && (
+              <div className={styles.moreInfo}>Y {filtered.length - 50} movimientos más...</div>
             )}
           </Card>
         </section>

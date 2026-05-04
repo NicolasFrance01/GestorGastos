@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import styles from "./Login.module.css";
@@ -10,6 +11,7 @@ import styles from "./Login.module.css";
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
 
@@ -56,13 +58,18 @@ export default function LoginPage() {
           </div>
           <div className={styles.inputGroup}>
             <label>Contraseña</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="••••••••"
-            />
+            <div className={styles.passwordWrapper}>
+              <input
+                type={showPassword ? "text" : "password"}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="••••••••"
+              />
+              <button type="button" className={styles.eyeBtn} onClick={() => setShowPassword(!showPassword)}>
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
           </div>
           <Button type="submit" isLoading={isLoading} className={styles.submitBtn}>
             Iniciar Sesión
