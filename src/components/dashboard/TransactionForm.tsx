@@ -64,6 +64,7 @@ export const TransactionForm = ({
   const [newWalletName, setNewWalletName] = useState("");
   const [newWalletType, setNewWalletType] = useState("CASH");
   const [savingWallet, setSavingWallet] = useState(false);
+  const [showAllCats, setShowAllCats] = useState(false);
 
   useEffect(() => { if (isOpen && spaceId) fetchData(); }, [isOpen, spaceId, type]);
 
@@ -112,7 +113,9 @@ export const TransactionForm = ({
       setWallets(Array.isArray(wData) ? wData : []);
       if (wData.length > 0 && !walletId) setWalletId(wData[0].id);
       if (!isEdit && cats.length > 0) setCategoryId(cats[0].id);
+      setShowAllCats(false);
     } catch (error) { console.error(error); }
+    finally { setIsLoading(false); }
   };
 
   const handleWalletChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -263,7 +266,7 @@ export const TransactionForm = ({
                 </button>
               </div>
               <div className={styles.categoryGrid}>
-                {categories.map(cat => (
+                {(showAllCats ? categories : categories.slice(0, 4)).map(cat => (
                   <button key={cat.id} type="button"
                     className={clsx(styles.categoryBtn, categoryId === cat.id && styles.selectedCategory)}
                     style={{ "--cat-color": cat.color } as React.CSSProperties}
@@ -274,6 +277,16 @@ export const TransactionForm = ({
                   </button>
                 ))}
               </div>
+
+              {categories.length > 4 && (
+                <button
+                  type="button"
+                  className={styles.showMoreBtn}
+                  onClick={() => setShowAllCats(!showAllCats)}
+                >
+                  {showAllCats ? "Ver menos" : `Ver más (${categories.length - 4} más)`}
+                </button>
+              )}
 
               {showNewCat && (
                 <div className={styles.inlineForm}>
