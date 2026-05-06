@@ -87,7 +87,7 @@ export async function GET(req: Request) {
     return NextResponse.json({
       stats,
       chartData: Object.values(categoryTotals),
-      recentTransactions: transactions.slice(0, 5),
+      recentTransactions: transactions.slice(0, 20),
     });
   } catch (error) {
     console.error(error);
