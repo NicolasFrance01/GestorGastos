@@ -3,6 +3,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = "force-dynamic";
+
 function getPeriodFilter(period: string | null) {
   if (!period || period === "all") return undefined;
 
@@ -87,7 +89,7 @@ export async function GET(req: Request) {
     return NextResponse.json({
       stats,
       chartData: Object.values(categoryTotals),
-      recentTransactions: transactions.slice(0, 20),
+      recentTransactions: transactions.slice(0, 50),
     });
   } catch (error) {
     console.error(error);
